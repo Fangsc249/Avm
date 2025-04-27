@@ -1,0 +1,37 @@
+﻿[
+  {
+    "Type": "Assign",
+    "Variable": "maxCount",
+    "Value": 5
+  },
+  {
+	"Type": "Assign",
+	"Variable":"Message",
+	"Value":"Hello Virtual Machine!"
+  },
+
+  {
+    "Type": "Loop",
+    "VariableIterations": "maxCount",
+    "Instructions": [
+      {
+        "Type": "Print",
+        "Variable": "CurrentLoopIndex"
+      },
+	  {
+		"Type":"Print",
+		"Variable":"Message"
+	  },
+	  {
+	  	  "Type":"Loop",
+		  "FixedIterations":"3",
+		  "Instructions":[
+			{
+				"Type":"Print",
+				"Variable":"maxCount"
+			}
+		  ]
+	  }
+    ]
+  }
+]

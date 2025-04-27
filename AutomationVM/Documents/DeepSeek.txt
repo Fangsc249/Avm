@@ -1,0 +1,35 @@
+﻿
+2025-3-20
+用c#设计的一个虚拟机，它通过加载特定格式(Json,Yaml)的指令序列实现一些任务的自动化。
+它的第一个用途将会是通过SAP GuiScripting 实现sap操作自动化但不会局限于此，
+比如类似的,通过playwright实现网页app操作自动化，实现windows 文件系统批量操作自动化，等等。
+作为一个开始，我们的目标是实现三个指令：变量赋值，打印变量，循环指令。
+
+2025-3-30
+
+## XML格式规范
+- 必须用`<Script>`作为根元素
+- 指令名作为子元素名（如`<While>`）
+- 属性对应简单参数，嵌套元素对应复杂参数
+
+两种脚本格式的等价形式
+JSON (数组根)
+[
+  {
+    "SapConnectTo": { "System": "Q01" }
+  },
+  {
+    "While": {
+      "Condition": "=Vars.counter < 5",
+      "Instructions": [...]
+    }
+  }
+]
+
+YAML (列表根)
+
+- SapConnectTo:
+    System: Q01
+- While:
+    Condition: =Vars.counter < 5
+    Instructions: [...]
