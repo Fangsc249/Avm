@@ -43,7 +43,8 @@ namespace vmApp
         {
             Console.Clear();
             Log.Logger = LoggerConfig.CreateLogger();
-            var script = "main";
+
+            var script = "";
             if (args.Length > 0)
             {
                 script = args[0];
