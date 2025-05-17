@@ -43,7 +43,10 @@ namespace vmApp
         {
             Console.Clear();
             Log.Logger = LoggerConfig.CreateLogger();
-
+            DumpConfig.Default.TypeNamingConfig.ShowTypeNames = false;
+            DumpConfig.Default.TableConfig.ShowRowSeparators = true;
+            DumpConfig.Default.TypeRenderingConfig.QuoteStringValues = false;
+            DumpConfig.Default.ColorConfig.PropertyValueColor = DumpColor.FromHexString("#008b8b");
             var script = "";
             if (args.Length > 0)
             {
@@ -67,10 +70,16 @@ namespace vmApp
             {
                 //Log.Fatal(e.ExceptionObject as Exception, "全局未处理异常");
                 var ex = e.ExceptionObject as Exception;
-                //ExceptionFormatter.FormatException(ex).Dump();
-                ex.Dump();
-                //ex.ToCleanStackTrace().Dump();
-                Environment.Exit(1);
+                ex.ToCleanStackTrace().Dump();
+
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    //"调试器已附加",在vs中Debug时，不会退出
+                }
+                else
+                {
+                    Environment.Exit(1);//此处注释掉，CLR会再次显示异常信息!
+                }
             };
             //throw new IOException("Test");
             var services = new ServiceCollection()
