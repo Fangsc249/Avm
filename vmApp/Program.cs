@@ -49,7 +49,7 @@ namespace vmApp
             {
                 script = args[0];
             }
-            else //无参数启动，一般是在开发中测试
+            else //无参数启动，开发中测试
             {
                 await Scripts.SapScriptAsync();
                 return;
@@ -57,7 +57,7 @@ namespace vmApp
             /*
              * 不同的指令集需要执行上下文参数ExecutionContex提供不同的服务
              * 比如Sap指令需要SAPActive类提供的获取GuiSession的功能，而
-             * Playwright则需要其它功能以启动浏览器，下面就对这些服务
+             * Playwright则需要其它功能以启动浏览器，下面对这些服务
              * 进行注册。以SapConnectToInstruction为例，它需要获取一个GuiSession
              * var s = context.GetService<SAPActive>().GetSession(System);
              * 
@@ -77,7 +77,7 @@ namespace vmApp
                 .AddTransient<SAPActive, SAPActive>();
             //根据此主程序需要用到的指令集（添加指令集引用）
             //下面是把指令集中提供的指令解析类中的指令解析方注册到一个静态字典中。
-            InstructionParser.BuildParserCache(typeof(AutomationVM.Module.SAPInstructions.SapInstructionParsers));
+            InstructionParser.BuildParserCache(typeof(SapInstructionParsers));
             InstructionParser.BuildParserCache(typeof(AutomationVM.UtilInstructions.UtilsInstructionParsers));
             InstructionParser.BuildParserCache(typeof(PlaywrightInstructionParsers));
             var vm = new MultiplatformVM(); // 内部会注册CoreInstruction
@@ -236,7 +236,8 @@ class Scripts
             Id = SAPID.ID_CS03_BOM_TABLE,
             TargetVariable = "tableData",
             Columns = "0,1,2,3,4,5,8",
-            Filters = new List<RowFilter> { new RowFilter { ColumnIndex = 3, FilterRule = "Contains", Value = "" } },
+            Filters = new List<RowFilter> {
+                new RowFilter { ColumnIndex = 3, FilterRule = "Contains", Value = "" } },
         });
         instructions.Add(new CodeInstruction() { Statements = @"=VarsDict[""tableData""].Dump();" });
 

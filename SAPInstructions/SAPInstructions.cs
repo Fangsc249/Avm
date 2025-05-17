@@ -56,6 +56,9 @@ namespace AutomationVM.Module.SAPInstructions
         public string FilterRule { get; set; }
         public string Value { get; set; }
     }
+
+    //*************************************************************************
+
     public abstract class SapInstructionBase : Instruction
     {
         protected abstract Task PerformSapAction(GuiSession session);
@@ -130,29 +133,6 @@ namespace AutomationVM.Module.SAPInstructions
 
         public string LangCodeId { get; set; }
         public string LangCode { get; set; }
-
-        //public override async Task ExecuteCoreAsync(ExecutionContext context)
-        //{
-        //    UserId = await EvaluateParameterAsync(UserId, context) as string;
-        //    User = await EvaluateParameterAsync(User, context) as string;
-        //    PasswordId = await EvaluateParameterAsync(PasswordId, context) as string;
-        //    Password = await EvaluateParameterAsync(Password, context) as string;
-        //    LangCodeId = await EvaluateParameterAsync(LangCodeId, context) as string;
-        //    LangCode = await EvaluateParameterAsync(LangCode, context) as string;
-
-        //    GuiSession s = context.Vars.session;
-        //    await s.WaitSapAsync();
-        //    await Try(CallerInfo(), () => s.SetAsync(UserId, User));
-        //    await Try(CallerInfo(), () => s.SetAsync(PasswordId, Password));
-        //    await Try(CallerInfo(), () => s.SetAsync(LangCodeId, LangCode));
-
-        //    s.PressEnter();
-        //    await s.WaitSapAsync();
-        //    GuiStatusbar sbar = s.Sbar();
-        //    context.Vars.SapStatusType = sbar.MessageType;
-        //    context.Vars.SapStatus = sbar.Text;
-        //    context.Vars.NeedLogon = false;
-        //}
 
         protected override async Task PerformSapAction(GuiSession s)
         {
@@ -272,20 +252,6 @@ namespace AutomationVM.Module.SAPInstructions
     public class SapClickButton : SapInstructionBase
     {
         public string Id { get; set; }
-        //public override async Task ExecuteCoreAsync(ExecutionContext context)
-        //{
-        //    Id = await EvaluateParameterAsync(Id, context) as string;
-        //    GuiSession session = context.Vars.session;
-        //    await Task.Run(() =>
-        //    {
-        //        session.Click(Id);
-        //        session.WaitSap();
-        //        GuiStatusbar sbar = session.Sbar();
-        //        context.Vars.SapStatusType = sbar.MessageType;
-        //        context.Vars.SapStatus = sbar.Text;
-        //    });
-        //}
-
         protected override async Task PerformSapAction(GuiSession session)
         {
             Id = await EvaluateParameterAsync(Id, Context) as string;
@@ -332,7 +298,7 @@ namespace AutomationVM.Module.SAPInstructions
     {
         public string Id { get; set; }
         public string TabText { get; set; }
-        
+
         protected override async Task PerformSapAction(GuiSession session)
         {
             Id = await EvaluateParameterAsync(Id, Context) as string;
@@ -354,12 +320,6 @@ namespace AutomationVM.Module.SAPInstructions
     }
     public class SapSelectComboBox : SapInstructionBase
     {
-        //public override Task ExecuteCoreAsync(ExecutionContext context)
-        //{
-        //    //throw new Exception("");
-        //    return Task.CompletedTask;
-        //}
-
         protected override async Task PerformSapAction(GuiSession session)
         {
             await Task.CompletedTask;
@@ -410,17 +370,8 @@ namespace AutomationVM.Module.SAPInstructions
             GuiSession s = context.Vars.session;
             var list = new List<ExpandoObject>();
             context.VarsDict[TargetVariable] = list;
-            //var filterBuilder = new GuiRowFilterBuilder();
             var table = s.findById2(Id) as GuiTableControl;
-            //Filters.Dump("Row Filters");
-            //foreach (var rf in Filters)
-            //{
-            //    if (rf.FilterRule == "Contains")
-            //        filterBuilder.Contains(rf.ColumnIndex, rf.Value);
-            //    if (rf.FilterRule == "NotContains")
-            //        filterBuilder.NotContains(rf.ColumnIndex, rf.Value);
-            //}
-            //var filter = filterBuilder.BuildForTable();
+
             var filter = Filters.BuildTableFilter();
             if (Columns != null)
             {
@@ -488,16 +439,7 @@ namespace AutomationVM.Module.SAPInstructions
             var list = new List<ExpandoObject>();
             context.VarsDict[TargetVariable] = list;
 
-            //var filterBuilder = new GuiRowFilterBuilder();
-            //Filters.Dump("Row Filters");
-            //foreach (var rf in Filters)
-            //{
-            //    if (rf.FilterRule == "Contains")
-            //        filterBuilder.Contains(rf.ColumnIndex, rf.Value);
-            //    if (rf.FilterRule == "NotContains")
-            //        filterBuilder.NotContains(rf.ColumnIndex, rf.Value);
-            //}
-            //var filter = filterBuilder.BuildForGrid();
+
             var filter = Filters.BuildGridFilter();//2025-4-23
             var grid = s.findById2(Id) as GuiGridView;
             //grid.ColumnOrder 这里是dynamic，vs2022下则是object
