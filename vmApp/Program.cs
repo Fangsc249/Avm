@@ -54,7 +54,7 @@ namespace vmApp
             }
             else //无参数启动，开发中测试
             {
-                await Scripts.SapScriptAsync();
+                await Scripts.PWScriptAsync();
                 return;
             }
             /*
@@ -136,7 +136,7 @@ namespace vmApp
         {
             var logBuilder = new LoggerConfiguration()
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.File("logs/vm.log",
+                .WriteTo.File($"{AppDomain.CurrentDomain.BaseDirectory}/logs/vm.log",
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 3)
                 ;
@@ -176,85 +176,5 @@ public static class ExceptionExtensions
             CleanStackTrace = cleanedStackTrace,
             InnerException = ex.InnerException?.ToCleanStackTrace()
         };
-    }
-}
-class Scripts
-{
-    /*
-     * 在代码中写脚本,可以进一步体会抽象与隔离，以及上下文。
-     * 曾记得，当初在南京学习WWF时，对其中的上下文概念不能透彻理解。
-     * 体会每个功能都用统一的模式进行封装带来的复用便利性，以及性能损失。
-     * 2025-4-22
-     */
-    public static async Task CreateScriptAsync()
-    {
-        //以代码的形式创建脚本
-        var instCode = new CodeInstruction() { Statements = $@"
-                =
-                Console.WriteLine(""Hello world!"");
-                VarsDict[""Message2""] = ""嗯，Yaml确实是一个好用的工具！"";
-            " };
-        var instStringAssign = new StringAssignInstruction()
-        {
-            Variable = "Message",
-            LiteralValue = "Yaml 这是一个好用的工具！"
-        };
-        var instExpressionAssign = new ExpressionAssignInstruction()
-        {
-            Variable = "x",
-            Expression = "=2+3+5"
-        };
-        var instCode2 = new CodeInstruction()
-        {
-            Statements = "= Vars.x2 = 2+3+5;VarsDict.Dump();",
-        };
-        List<Instruction> instructions = new List<Instruction>
-            {
-                instCode,instStringAssign,instCode2
-            };
-        var ctx = new ExecutionContext();
-        foreach (var inst in instructions)
-        {
-            await inst.ExecuteAsync(ctx);
-        }
-    }
-    public static async Task SapScriptAsync()
-    {
-        List<Instruction> instructions = new List<Instruction>();
-        instructions.Add(new SapConnectTo() { System = "AAA-EHP6" });
-        instructions.Add(new IfInstruction()
-        {
-            Condition = "= Vars.NeedLogon",
-            thenInstructions = new List<Instruction>
-                {
-                    new SapLogon()
-                    {
-                        UserId=SAPID.ID_USERID, User="LRP",
-                        PasswordId=SAPID.ID_PASSWORD, Password="123456",
-                        LangCodeId=SAPID.ID_LANGCODE, LangCode="EN",
-                    }
-                }
-        });
-        instructions.Add(new SapStartTransaction() { TCode = "CS03" });
-        instructions.Add(new SapSetText() { Id = SAPID.ID_CS03_MATERIAL, Value = "DPC6" });
-        instructions.Add(new SapSetText() { Id = SAPID.ID_CS03_PLANT, Value = "1200" });
-        instructions.Add(new SapSetText() { Id = SAPID.ID_CS03_BOM_USAGE, Value = "1" });
-        instructions.Add(new SapEnter());
-        instructions.Add(new SapGetTableData()
-        {
-            Id = SAPID.ID_CS03_BOM_TABLE,
-            TargetVariable = "tableData",
-            Columns = "0,1,2,3,4,5,8",
-            Filters = new List<RowFilter> {
-                new RowFilter { ColumnIndex = 3, FilterRule = "Contains", Value = "" } },
-        });
-        instructions.Add(new CodeInstruction() { Statements = @"=VarsDict[""tableData""].Dump();" });
-
-        var services = new ServiceCollection()
-            .AddTransient<SAPActive, SAPActive>();
-
-        var vm = new MultiplatformVM();
-        vm.SetServiceProvider(services.BuildServiceProvider());
-        await vm.ExecuteCore(instructions);
     }
 }
